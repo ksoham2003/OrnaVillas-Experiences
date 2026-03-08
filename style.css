@@ -1,0 +1,1054 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body,
+html {
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    /* overflow: hidden; Removed so Lenis can take over scrolling */
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(150, 150, 150, 0.5);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(150, 150, 150, 0.8);
+}
+
+* {
+    scrollbar-width: thin;
+    /* Firefox */
+    scrollbar-color: rgba(150, 150, 150, 0.5) transparent;
+}
+
+/* Basic Lenis setup */
+html.lenis,
+html.lenis body {
+    height: auto;
+}
+
+.lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+    overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+    pointer-events: none;
+}
+
+.main-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    /* Changed from 100% to ensure it takes full viewport even with Lenis active */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Base states before GSAP kicks in */
+
+.image-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 35vw;
+    height: 45vh;
+    overflow: hidden;
+    z-index: 1;
+    /* Sits beneath the huge text */
+}
+
+.hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* starts slightly zoomed in for a parallax effect during expansion */
+    transform: scale(1.15);
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    /* Darkening gradient from bottom and top to make text readable */
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.1) 40%, rgba(0, 0, 0, 0.2) 60%, rgba(0, 0, 0, 0.8) 100%);
+    opacity: 0;
+    /* Animated to 1 */
+    pointer-events: none;
+}
+
+/* Huge Main Titles */
+.main-title {
+    font-size: 7.5vw;
+    line-height: 1.05;
+    letter-spacing: -1px;
+    z-index: 10;
+    white-space: nowrap;
+}
+
+.light {
+    font-weight: 300;
+}
+
+.medium {
+    font-weight: 500;
+}
+
+.main-title-left {
+    position: absolute;
+    top: 45%;
+    left: 6%;
+    transform: translateY(-50%);
+}
+
+.main-title-right {
+    position: absolute;
+    top: 60%;
+    right: 8%;
+    transform: translateY(-50%);
+}
+
+/* UI Elements Overlay Layer */
+.ui-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2.5vw 4vw;
+    pointer-events: none;
+    /* enable when animation completes */
+    opacity: 0;
+    /* Fade in via GSAP */
+}
+
+/* Header styling (Now Fixed) */
+#main-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    font-size: 0.9rem;
+    font-weight: 300;
+    padding: 2.5vw 4vw;
+    /* transition colors when scrolled via a dark class */
+    transition: color 0.3s background 0.3s;
+    color: #fff;
+    opacity: 0;
+    /* JS will fade this in same as before */
+    pointer-events: none;
+    /* enable when animation completes */
+}
+
+#main-header.scrolled {
+    color: #000;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2.5rem;
+}
+
+.nav-links a {
+    color: inherit;
+    text-decoration: none;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.nav-links a:hover {
+    opacity: 1;
+}
+
+.logo-center a {
+    color: inherit;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+}
+
+/* Header Right Area */
+.header-right-dynamic {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.header-stats-wrapper {
+    display: flex;
+    gap: 2.5rem;
+    opacity: 0.8;
+    transition: opacity 0.3s, visibility 0.3s, transform 0.3s;
+}
+
+.header-icons {
+    display: flex;
+    gap: 1rem;
+    margin-left: 1rem;
+}
+
+.icon-circle {
+    width: 36px;
+    height: 36px;
+    border: 1px solid currentColor;
+    opacity: 0.6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.icon-circle:hover {
+    opacity: 1;
+    background: currentColor;
+}
+
+/* Custom trick to inverse SVG color on hover since currentColor limits us */
+#main-header:not(.scrolled) .icon-circle:hover svg {
+    color: #000;
+}
+
+#main-header.scrolled .icon-circle:hover svg {
+    color: #fff;
+}
+
+.header-placeholder-for-line {
+    /* Spacings inside UI layer for just the line since header is out */
+    height: 40px;
+    margin-bottom: 1.5rem;
+}
+
+.header-line {
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+    margin-bottom: auto;
+}
+
+/* Floating Book Button */
+.book-btn {
+    position: absolute;
+    right: 8%;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 1rem 2rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: background 0.3s, transform 0.3s;
+}
+
+.book-btn:hover {
+    background: #f0f0f0;
+    transform: translateY(-50%) scale(1.05);
+}
+
+/* Bottom Section */
+.bottom-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 100%;
+}
+
+.content-left {
+    max-width: 450px;
+}
+
+.team-avatars {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid #000;
+    object-fit: cover;
+    margin-right: -12px;
+}
+
+.avatar.more {
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    z-index: 10;
+}
+
+.team-label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 1.5rem;
+}
+
+.description {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 300;
+}
+
+/* Location Widget */
+.location-widget {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1rem 1.5rem;
+    background: rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.loc-icon {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.loc-details {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.9rem;
+    padding-right: 1.5rem;
+}
+
+.loc-details .state {
+    color: #fff;
+    font-weight: 400;
+    margin-bottom: 0.2rem;
+}
+
+.loc-details .country {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+}
+
+.loc-actions {
+    display: flex;
+    gap: 1rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    padding-left: 1.5rem;
+}
+
+.action-icon {
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.action-icon:hover {
+    color: #fff;
+}
+
+/* --- SECOND SECTION --- */
+.slider-section {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background-color: #fff;
+    color: #000;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Dark Theme Header - Deprecated */
+
+.slider-container {
+    flex: 1;
+    display: flex;
+    position: relative;
+    overflow: hidden;
+    padding: 0 4vw;
+}
+
+/* Navigation Left */
+.slider-nav {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 15%;
+    position: relative;
+}
+
+.nav-numbers {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    font-size: 1.2rem;
+    color: rgba(0, 0, 0, 0.2);
+}
+
+.nav-num {
+    position: relative;
+    transition: color 0.3s, font-size 0.3s;
+}
+
+.nav-num.active {
+    color: #000;
+    font-size: 1.5rem;
+}
+
+.nav-num.active::before {
+    content: "•";
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #000;
+}
+
+.nav-total {
+    position: absolute;
+    bottom: 5vh;
+    font-size: 0.9rem;
+    color: rgba(0, 0, 0, 0.5);
+}
+
+/* Center Visual */
+.slider-visual {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding-bottom: 2rem;
+    /* offset visual balance */
+}
+
+.circle-container {
+    width: 35vw;
+    height: 35vw;
+    border-radius: 50%;
+    position: relative;
+}
+
+.circle-bg {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    /* Empty canvas state */
+}
+
+.slide-img {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    /* Default is fully masked out */
+    mask-image: conic-gradient(#000 0deg, transparent 0deg);
+    -webkit-mask-image: conic-gradient(#000 0deg, transparent 0deg);
+}
+
+#img-1 {
+    --arc: 0deg;
+}
+
+#img-2 {
+    --arc: 0deg;
+}
+
+#img-3 {
+    --arc: 0deg;
+}
+
+/* In a real scenario we'd use CSS Houdini 
+   but for wide support GSAP updates variable 
+   which is manually applied via inline style 
+   in JS. However, setting initial state is good. */
+
+.sweep-line-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform-origin: center;
+    z-index: 50;
+    pointer-events: none;
+}
+
+.sweep-line {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 1px;
+    height: 50%;
+    background-color: #000;
+    transform-origin: bottom;
+}
+
+.sweep-dot {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    background-color: #000;
+    border-radius: 50%;
+}
+
+/* Center dot */
+.circle-container::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background-color: #000;
+    border-radius: 50%;
+    z-index: 60;
+}
+
+/* Right Content */
+.slider-content {
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    padding-left: 2rem;
+}
+
+.slide-text {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    visibility: hidden;
+    /* Removed CSS transitions to let GSAP handle visibility purely */
+    /* 3D Setup for Text Rotation */
+    perspective: 1000px;
+    transform-style: preserve-3d;
+}
+
+.slide-text.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.slide-text h2,
+.slide-text p {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+/* Character styling for the 3D effect */
+.char {
+    display: inline-block;
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+.slide-text h2 {
+    font-size: 2.2rem;
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+    white-space: nowrap;
+}
+
+.slide-text p {
+    font-size: 1rem;
+    color: rgba(0, 0, 0, 0.5);
+}
+
+/* Bottom elements */
+.slider-bottom {
+    position: absolute;
+    bottom: 4vh;
+    left: 4vw;
+    right: 4vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.best-month {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.coordinates-container {
+    position: absolute;
+    bottom: 2vh;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 30px;
+}
+
+.coord-item {
+    position: absolute;
+    font-size: 1.8rem;
+    font-weight: 300;
+    white-space: nowrap;
+    opacity: 0;
+}
+
+.coord-item.active {
+    opacity: 1;
+}
+
+.dark-btn {
+    position: relative;
+    top: auto;
+    right: auto;
+    transform: none;
+    background: #000;
+    color: #fff;
+    padding: 1rem 2rem;
+}
+
+.dark-btn:hover {
+    background: #222;
+    transform: scale(1.05);
+}
+
+/* --- THIRD SECTION: GRID REVEAL --- */
+.grid-section {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    color: #fff;
+}
+
+.grid-bg {
+    position: absolute;
+    inset: 0;
+    /* Use the tree image as background */
+    background-image: url('https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=2000&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    /* Darken slightly for readability */
+    filter: brightness(0.85);
+    transform: scale(1.1);
+    /* Slight zoom for GSAP parallax later */
+}
+
+/* 3x3 Grid Overlay container */
+.grid-container {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    /* Divide horizontally and vertically into thirds */
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+}
+
+/* Grid Lines for GSAP to animate */
+.grid-line {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.4);
+    z-index: 10;
+}
+
+.h-line {
+    height: 1px;
+    width: 0;
+}
+
+.v-line {
+    width: 1px;
+    height: 0;
+}
+
+/* 
+  Top horizontal line. 
+  It should NOT cover (1,1).
+  Starts from the 2nd column.
+*/
+.h-line-1 {
+    top: 33.33%;
+    left: 33.33%;
+}
+
+/* Bottom horizontal line. Spans entire width */
+.h-line-2 {
+    top: 66.66%;
+    left: 0;
+}
+
+/* 
+  Left Vertical line. 
+  Should NOT cover (1,1) but needs to cover 'Event Planning' in (2,2) and (3,2).
+  Since (1,1) is on the left of this border, making this line start from top: 0
+  will simply create the right boundary for (1,1) which might be acceptable.
+  To strictly avoid (1,1) entirely, we keep `left: 33.33%`.
+  Let's start it from top: 33.33% so it doesn't cross the top empty cells.
+*/
+.v-line-1 {
+    left: 33.33%;
+    top: 33.33%;
+}
+
+/* Right Vertical Line.
+   Starts from top: 0 to create the border between (1,2) and (1,3)
+*/
+.v-line-2 {
+    left: 66.66%;
+    top: 0;
+}
+
+/* Individual Grid Cells/Items */
+.grid-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 2.5rem;
+    z-index: 20;
+    /* Increased duration to 0.8s for a slower background color transition */
+    transition: background-color 0.8s ease, color 0.8s ease;
+}
+
+/* Hoverable cells turning white */
+.grid-item.hoverable {
+    cursor: none;
+    /* Hide default cursor to show our custom one */
+}
+
+.grid-item.hoverable:hover {
+    background-color: #fff;
+    color: #000;
+}
+
+.grid-item.hoverable:hover .subtext,
+.grid-item.hoverable:hover .desc {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.subtext {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 0.3rem;
+    transition: color 0.4s ease;
+}
+
+/* Positioning content within the cells */
+.item-text-top-left {
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+}
+
+.item-text-right {
+    align-items: flex-end;
+    justify-content: flex-start;
+    text-align: right;
+}
+
+.item-text-left {
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.item-text-center {
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.item-text-bottom-left {
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.item-text-bottom-right {
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.desc {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 300;
+    transition: color 0.4s ease;
+}
+
+/* White Interactive Box */
+.item-action-box {
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    color: #000;
+    cursor: pointer;
+    transition: background 0.4s;
+}
+
+.item-action-box .action-text {
+    font-size: 1.1rem;
+    font-weight: 400;
+    margin-bottom: auto;
+    align-self: flex-start;
+}
+
+.action-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: auto;
+    transition: all 0.4s ease;
+}
+
+.action-btn span {
+    font-size: 0.7rem;
+    margin-bottom: 2px;
+}
+
+.action-btn svg {
+    transition: transform 0.4s ease;
+}
+
+/* Hover effect on white box */
+.item-action-box:hover .action-btn {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+}
+
+.item-action-box:hover .action-btn svg {
+    transform: translate(2px, -2px);
+}
+
+/* Custom details cursor */
+#custom-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: transparent;
+    border: 1px solid rgba(0, 0, 0, 0);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 9999;
+    /* Let GSAP handle transforms; CSS handles colours */
+    transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+    color: transparent;
+}
+
+#custom-cursor span {
+    font-size: 0.8rem;
+    margin-bottom: 2px;
+}
+
+#custom-cursor svg {
+    transition: transform 0.3s ease;
+}
+
+/* Base state when active (hovering over grid items) */
+#custom-cursor.active {
+    border-color: rgba(0, 0, 0, 0.2);
+    color: #000;
+}
+
+#custom-cursor.active svg {
+    transform: translate(2px, -2px);
+}
+
+/* Hovering over the actual item text makes cursor solid */
+#custom-cursor.solid {
+    background-color: #000;
+    color: #fff;
+    border-color: #000;
+}
+
+/* GSAP Start States */
+.grid-item>* {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* --- MODAL SYSTEM --- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background: rgba(255, 255, 255, 0.95);
+    width: 90%;
+    max-width: 500px;
+    padding: 3rem;
+    position: relative;
+    border-radius: 20px;
+    color: #000;
+    transform: translateY(40px);
+    transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.modal-overlay.active .modal-content {
+    transform: translateY(0);
+}
+
+.modal-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #666;
+    line-height: 1;
+    transition: color 0.3s;
+}
+
+.modal-close:hover {
+    color: #000;
+}
+
+.modal-header {
+    margin-bottom: 2rem;
+}
+
+.modal-subtitle {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #888;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.modal-header h2 {
+    font-size: 2rem;
+    font-weight: 500;
+    letter-spacing: -1px;
+}
+
+.booking-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #444;
+}
+
+.form-group input,
+.form-group select {
+    padding: 1rem;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    background: #fdfdfd;
+    outline: none;
+    transition: border-color 0.3s, background 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #000;
+    background: #fff;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.modal-submit {
+    margin-top: 1rem;
+    width: 100%;
+}
+
+/* Magnetic element transitions */
+.magnetic-item {
+    display: inline-block;
+}
+
+/* Ensure book buttons are interactive */
+.book-btn {
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s, color 0.3s;
+}
+
+.book-btn:active {
+    transform: scale(0.95);
+}

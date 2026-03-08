@@ -1,0 +1,239 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #000;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+.booking-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.booking-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2000&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    z-index: -2;
+    transform: scale(1.1);
+}
+
+.booking-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.8) 100%);
+    z-index: -1;
+}
+
+.booking-header {
+    padding: 2.5vw 4vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 10;
+}
+
+.back-link {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 300;
+    opacity: 0.7;
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.back-link:hover {
+    opacity: 1;
+    transform: translateX(-5px);
+}
+
+.logo {
+    font-size: 1.2rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+.booking-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10vw;
+    gap: 5vw;
+}
+
+.booking-reveal-text {
+    max-width: 400px;
+}
+
+.subtitle {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 3px;
+}
+
+h1 {
+    font-size: 4rem;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -2px;
+}
+
+.booking-card {
+    background: rgba(255, 255, 255, 0.95);
+    width: 100%;
+    max-width: 500px;
+    padding: 3rem;
+    border-radius: 24px;
+    color: #000;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.booking-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+}
+
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.form-section label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.select-wrapper {
+    position: relative;
+}
+
+select,
+input[type="date"],
+.number-input input {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 1rem;
+    background: #f9f9f9;
+    outline: none;
+    transition: border-color 0.3s, background 0.3s;
+    appearance: none;
+}
+
+select:focus,
+input:focus {
+    border-color: #000;
+    background: #fff;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.number-input {
+    display: flex;
+    align-items: center;
+    background: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.number-input button {
+    width: 40px;
+    height: 100%;
+    border: none;
+    background: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.number-input button:hover {
+    background: #eee;
+}
+
+.number-input input {
+    border: none;
+    border-left: 1px solid #e0e0e0;
+    border-right: 1px solid #e0e0e0;
+    border-radius: 0;
+    text-align: center;
+    padding: 0.8rem;
+}
+
+.confirm-btn {
+    position: relative;
+    padding: 1.2rem;
+    border: none;
+    border-radius: 12px;
+    background: #000;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.confirm-btn:hover {
+    transform: translateY(-3px);
+}
+
+.confirm-btn:active {
+    transform: scale(0.98);
+}
+
+.booking-footer {
+    padding: 2.5vw 4vw;
+}
+
+.footer-info {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+}
+
+.footer-info span {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Base states for GSAP */
+.booking-reveal-text,
+.booking-card,
+.booking-header,
+.booking-footer {
+    opacity: 0;
+}
